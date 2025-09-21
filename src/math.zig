@@ -1,9 +1,5 @@
-pub fn add(comptime T: type, a: T, b: T) T {
-    return a + b;
-}
+const addmod = @import("./basic-arithmetic/add.zig");
 
-// tests
-test "add test" {
-    const std = @import("std");
-    try std.testing.expectEqual(@as(i32, 5), add(i32, 2, 3));
+pub export fn add_i32(a: i32, b: i32) i32 {
+    return try addmod.add(i32, a, b);
 }
