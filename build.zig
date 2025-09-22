@@ -4,18 +4,17 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const mathModule = b.addModule("zig0151Math", .{
-        .root_source_file = b.path("src/math.zig"),
+    const math_basic_mod = b.addModule("basicmod", .{
+        .root_source_file = b.path("src/basic.zig"),
         .target = target,
         .optimize = optimize,
     });
 
-    //mathModule.addImport("addmod", addModule);
-
-    const lib = b.addLibrary(.{
-        .name = "mathlib",
+    const math_basic_lib = b.addLibrary(.{
+        .name = "mathbasic",
         .linkage = .static,
-        .root_module = mathModule,
+        .root_module = math_basic_mod,
     });
-    b.installArtifact(lib);
+
+    b.installArtifact(math_basic_lib);
 }

@@ -2,8 +2,14 @@ const std = @import("std");
 
 pub fn div(comptime T: type, a: T, b: T) !T {
     return switch (@typeInfo(T)) {
-        .int => blk: {
-            break :blk std.math.divExact(T, a, b);
+        .int => |int_info| blk: {
+            if (int_info.signedness == .signed) {
+                break :blk std.math.divExact(T, a, b);
+            } else {
+                if (b == 0) break :blk error.DivByZero;
+                if (a % b != 0) break :blk error.InexactDivision;
+                break :blk a / b;
+            }
         },
         .float => blk: {
             break :blk a / b;
@@ -54,4 +60,31 @@ test "float division edge cases" {
 
     // Infinity / finite = inf
     try std.testing.expectEqual(std.math.inf(f32), try div(f32, std.math.inf(f32), 2.0));
+}
+test "unsigned integer division edge cases" {
+    // Normal division u8
+    try std.testing.expectEqual(@as(u8, 2), try div(u8, 6, 3));
+
+    // Division by zero u8
+    try std.testing.expectError(error.DivByZero, div(u8, 5, 0));
+
+    // Inexact division u8
+    try std.testing.expectError(error.InexactDivision, div(u8, 7, 2));
+
+    // Boundary u8
+    try std.testing.expectEqual(std.math.maxInt(u8), try div(u8, std.math.maxInt(u8), 1));
+    try std.testing.expectEqual(@as(u8, 0), try div(u8, 0, 123));
+
+    // Normal division u16
+    try std.testing.expectEqual(@as(u16, 2), try div(u16, 1000, 500));
+
+    // Division by zero u16
+    try std.testing.expectError(error.DivByZero, div(u16, 100, 0));
+
+    // Inexact division u16
+    try std.testing.expectError(error.InexactDivision, div(u16, 1001, 3));
+
+    // Boundary u16
+    try std.testing.expectEqual(std.math.maxInt(u16), try div(u16, std.math.maxInt(u16), 1));
+    try std.testing.expectEqual(@as(u16, 0), try div(u16, 0, 321));
 }
