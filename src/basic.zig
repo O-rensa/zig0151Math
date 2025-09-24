@@ -40,7 +40,7 @@ pub export fn sub_i32(a: i32, b: i32) i32 {
 }
 
 // sub f64
-pub export fn sub_f64(a: i32, b: i32) i32 {
+pub export fn sub_f64(a: f64, b: f64) f64 {
     return submod.sub(i32, a, b) catch 0;
 }
 
